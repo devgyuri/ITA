@@ -41,11 +41,13 @@
         // 결과 표시
         if(answer.join('') === input) {
           $logs.append(`[${input}]: Homerun!`);
+          restart();
           return;
         }
         if(tries.length >= 9) {
           const message = document.createTextNode(`Failed! The answer is ${answer.join('')}`);
           $logs.appendChild(message);
+          restart();
           return;
         }
 
@@ -80,10 +82,18 @@
           let restart_btn = document.createElement('button');
           restart_btn.innerHTML = 'restart';
           restart_btn.setAttribute('onClick', 'window.location.reload()');
-          $logs.append(fail_msg, document.createElement('br'), restart_btn);
+          $logs.append(fail_msg);
+          restart();
           return;
         }
       };
+
+      const restart = function () {
+        let restart_btn = document.createElement('button');
+        restart_btn.innerHTML = 'restart';
+        restart_btn.setAttribute('onClick', 'window.location.reload()');
+        $logs.append(document.createElement('br'), restart_btn);
+      }
 
       const checkInput = function (input) {
         if(!myRegExp.test(input)) { // 정수 4자리
