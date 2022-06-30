@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <title>숫자야구</title>
+  </head>
+  <body>
+    <form id="form">
+      <input type="text" id="input" placeholder='1234'>
+      <!-- minlength="4" maxlength="4" pattern="^(?!.*(.).*\1)\d{4} -->
+      <button>확인</button>
+    </form>
+    <div id="logs"></div>
+    <script>
+      const $input = document.querySelector('#input');
+      const $form = document.querySelector('#form');
+      const $logs = document.querySelector('#logs');
+      let input = ''
+      let out = 0;
+
+      const numbers = [];
+      const answer = [];
+      const tries = [];
+      const myRegExp = /[0-9]{4}/;
+
+      for(let n=0; n<9; n++) {
+        numbers.push(n+1);
+      }
+
+      for(let n=0; n<4; n++) {
+        const index = Math.floor(Math.random() * numbers.length); // 중복제거
+        answer.push(numbers[index]);
+        numbers.splice(index, 1);
+      }
+      console.log(answer);
+
+      const checkNumber = function (input) {
+        if(!checkInput(input))
+          return;
+
+        // 결과 표시
+        if(answer.join('') === input) {
+          $logs.append(`[${input}]: Homerun!`);
+          return;
+        }
+        if(tries.length >= 9) {
+          const message = document.createTextNode(`Failed! The answer is ${answer.join('')}`);
+          $logs.appendChild(message);
+          return;
+        }
+
+        // 스트라이크와 볼 개수
+        let strike = 0;
+        let ball = 0;
+        answer.forEach((element, ansIDX) => {
+          const index = input.indexOf(element);
+          if(index > -1) { // 일치하는 숫자 존재
+            if(index === ansIDX) { // 자리수도 같음
+              strike += 1;
+            } else { // 숫자만 같음
+              ball += 1;
+            }
+          }
+        });
+
+        $logs.append(`[${input}]: ${strike}S ${ball}B`, document.createElement('br'));
+        tries.push(input);
+
+        if(!strike && !ball) {
+          out++;
+          let out_msg = document.createElement('span');
+          out_msg.innerHTML = `${out} out!`;
+          out_msg.style.color = 'red';
+          $logs.append(out_msg, document.createElement('br'))
+        }
+        if(out === 3) {
+          let fail_msg = document.createElement('span');
+          fail_msg.innerHTML = `Failed! The answer is ${answer.join('')}`;
+          fail_msg.style.color = 'red';
+          let restart_btn = document.createElement('button');
+          restart_btn.innerHTML = 'restart';
+          restart_btn.setAttribute('onClick', 'window.location.reload()');
+          $logs.append(fail_msg, document.createElement('br'), restart_btn);
+          return;
+        }
+      };
+
+      const checkInput = function (input) {
+        if(!myRegExp.test(input)) { // 정수 4자리
+          return alert('Invalid number! Please retry.');
+        }
+        if(new Set(input).size !== 4) { // 중복된 숫자
+          return alert('Duplicated number! Please retry.');
+        }
+        if(tries.includes(input)) { // 이미 시도한 값
+          return alert('You have already tried this input. Please retry.')
+        }
+        return true;
+      };
+
+      const onSubmit = function (event) {
+        event.preventDefault(); // 기본 동작 막기. submit에서는 새로고침.
+        input = $input.value;
+        $input.value = '';
+
+        checkNumber(input);
+      };
+
+      $form.addEventListener('submit', onSubmit);
+    </script>
+  </body>
+</html>
