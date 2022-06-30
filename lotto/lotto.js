@@ -24,7 +24,7 @@ const colorBall = (number, $ball) => {
     color = 'gold';
   }
   else if(number < 30) {
-    color = 'green';
+    color = 'lawngreen';
   }
   else {
     color = 'dodgerblue';
